@@ -1,10 +1,10 @@
 ---
 title: "ANOVAs pro Gui"
 output:
-  word_document: default
   html_document:
     df_print: paged
   pdf_document: default
+  word_document: default
 ---
 
 por Francisko de Moraes Rezende, francisko.rezende@gmail.com, 2020-03-26
@@ -70,51 +70,8 @@ angle <-
   dplyr::mutate_at(.vars = vars(sp:rep), .funs = ~ factor(.))
 ```
 
-```{r}
-micro <-
-  read_xls(here("dados","Stat-microrrugosidade.xls")) %>% 
-  clean_names() %>% 
-  mutate_at(.vars = vars(sp:rep), .funs = ~ factor(.))
-
-micro_m1 <- lm(sq ~ sp*face, data = micro)
-
-anova(micro_m1)
-
-micro_m2 <- update(micro_m1, . ~ . - sp:face)
-
-anova(micro_m2)
-```
-
-```{r}
-anova(micro_m1)
-
-TukeyHSD(aov(micro_m1))
-```
-
-
-```{r}
-macro <- read_xls(here("dados", "Stat-macrorrugosidade.xls")) %>% 
-  clean_names() %>% 
-  mutate_at(.vars = vars(sp:rep), .funs = ~ factor(.))
-
-# macro_m1 <- lm()
-```
-
-
-
 
 # ANOVA ui
-
-## Média e desvio padrão
-
-```{r}
-ui %>% 
-  group_by(sp, face) %>% 
-  summarise(avg_ui = mean(ui),
-         sd_ui = sd(ui)) %>% 
-  knitr::kable(digits = 4)
-```
-
 
 ## Código
 
@@ -123,24 +80,22 @@ ui_m1 <- lm(ui ~ sp * face, data = ui)
 
 anova(ui_m1)
 
-(TukeyHSD(aov(ui_m1)))
+ui_m2 <- update(ui_m1, . ~ . -sp:face)
 
-# ui_m2 <- update(ui_m1, . ~ . -sp:face)
-# 
-# anova(ui_m2) %>% 
-#   rename(`P value` = `Pr(>F)`)
+anova(ui_m2) %>% 
+  rename(`P value` = `Pr(>F)`)
 ```
 
 ## Tabela ANOVA ui
 ```{r tabela-ui}
-anova(ui_m1) %>% 
+anova(ui_m2) %>% 
   rename(`P value` = `Pr(>F)`) %>% 
   knitr::kable(digits = 3)
 ```
 
 ## Gráfico
 
-Os dois gráficos abaixo tem as mesmas informações, escolha o que mais lhe agradar.
+Os dois gráficos abaixo tem as mesmas informções, escolha o que mais lhe agradar.
 
 ```{r grafico-ui}
 ui %>% 
@@ -160,21 +115,9 @@ ui %>%
         text = element_text(size = 12)) 
 ```
 
-## Tukey 
-
 
 
 # ANOVA angle
-
-## Média e desvio padrão
-
-```{r}
-angle %>% 
-  group_by(sp, face) %>% 
-  summarise(avg = mean(angle),
-         sd = sd(angle)) %>% 
-  knitr::kable(digits = 4)
-```
 
 ## Código
 
@@ -183,19 +126,17 @@ angle_m1 <- lm(angle ~ sp*face, data = angle)
 
 anova(angle_m1)
 
-(TukeyHSD(aov(angle_m1)))
+angle_m2 <- update(angle_m1, . ~ . - sp:face)
 
-# angle_m2 <- update(angle_m1, . ~ . - sp:face)
-# 
-# anova(angle_m1, angle_m2)
-# 
-# anova(angle_m2)
+anova(angle_m1, angle_m2)
+
+anova(angle_m2)
 ```
 
 ## Tabela
 
 ```{r tabela-angulo, echo=FALSE}
-anova(angle_m1) %>% 
+anova(angle_m2) %>% 
   rename(`P value` = `Pr(>F)`) %>% 
   knitr::kable(digits = 3)
 ```
@@ -217,11 +158,10 @@ angle %>%
 
 
 angle %>% 
-  ggplot(aes(x = sp, y = angle, color = face)) +
+  ggplot(aes(x = sp, y = angle)) +
   geom_boxjitter(jitter.height = 0) +
   theme_classic() +
   theme(axis.line.x = element_blank(),
         text = element_text(size = 12)) 
 ```
 
-## 
